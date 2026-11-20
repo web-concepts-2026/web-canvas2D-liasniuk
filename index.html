@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Canvas Drawing App</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app-layout">
+        
+        <aside class="sidebar" aria-label="Drawing Tools">
+            <button
+                    type="button"
+                    class="tool-btn active"
+                    data-tool="draw"
+                    title="Draw mode (D)"
+                    aria-label="Draw mode"
+                    aria-pressed="true"
+            >
+                D
+            </button>
+            <button
+                    type="button"
+                    class="tool-btn"
+                    data-tool="erase"
+                    title="Erase mode (E)"
+                    aria-label="Erase mode"
+                    aria-pressed="false"
+            >
+                E
+            </button>
+            <button
+                    type="button"
+                    class="tool-btn"
+                    data-tool="stamp"
+                    title="Stamp mode (S)"
+                    aria-label="Stamp mode"
+                    aria-pressed="false"
+            >
+                S
+            </button>
+            <div class="sidebar-divider" role="separator"></div>
+            <button
+                    type="button"
+                    class="action-btn"
+                    data-action="undo"
+                    title="Undo last operation (Ctrl+Z)"
+                    aria-label="Undo last operation"
+            >
+                ↺
+            </button>
+            <button
+                    type="button"
+                    class="action-btn"
+                    data-action="clean"
+                    title="Clean canvas (C)"
+                    aria-label="Clean canvas"
+            >
+                C
+            </button>
+        </aside>
+        
+        <header class="toolbar">
+            <div class="control-box size">
+                <label for="brush-size" class="control-label">min</label>
+                <input
+                    type="range"
+                    id="brush-size"
+                    min="1"
+                    max="60"
+                    value="8"
+                    aria-label="Brush size"
+                />
+                <span class="control-label">max</span>
+                <span id="size-value" class="size-badge" aria-live="polite">8px</span>
+            </div>
+            <label for="brush-color" class="control-box color">
+                <span class="control-label">Color</span>
+                <input
+                        type="color"
+                        id="brush-color"
+                        value="#1e1e1e"
+                        aria-label="Brush color"
+                />
+            </label>
+        </header>
+        
+        <main class="wrapper" id="wrapper">
+            <canvas id="canvas">
+                Some text over here
+            </canvas>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
