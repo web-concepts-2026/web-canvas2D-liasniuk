@@ -116,6 +116,80 @@ document.addEventListener("DOMContentLoaded", ()=>{
         ctx.stroke();
         ctx.restore();
     }
+    
+    function hexToRgba(hex){
+        const newHex = hex.replace("#", "");
+        const bigint = parseInt(newHex, 16);
+        return{
+            r: (bigint>>16) & 255,
+            g: (bigint>>8) & 255,
+            b: bigint & 255,
+            a: 255
+        };
+    }
+    
+    function Fill(x, y){
+        const startX = Math.floor(x);
+        const startY = Math.floor(y);
+        const width = canvas.width;
+        const height = canvas.height;
+
+        if (startX < 0 || startX >= width || startY < 0 || startY >= height) return;
+
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        const fillColor = hexToRgba(appState.color);
+
+        const startIdx = (startY * width + startX) * 4;
+        const targetR = data[startIdx];
+        const targetG = data[startIdx + 1];
+        const targetB = data[startIdx + 2];
+        const targetA = data[startIdx + 3];
+
+        if (
+            targetR === fillColor.r &&
+            targetG === fillColor.g &&
+            targetB === fillColor.b &&
+            targetA === fillColor.a
+        ) {
+            return;
+        }
+
+        const visited = new Uint8Array(width * height);
+        const stack = [[startX, startY]];
+
+        function matchesTarget(idx) {
+            return (
+                data[idx] === targetR &&
+                data[idx + 1] === targetG &&
+                data[idx + 2] === targetB &&
+                data[idx + 3] === targetA
+            );
+        }
+
+        while (stack.length > 0) {
+            const [cx, cy] = stack.pop();
+            const pos = cy * width + cx;
+
+            if (visited[pos]) continue;
+            visited[pos] = 1;
+
+            const idx = pos * 4;
+            if (!matchesTarget(idx)) continue;
+
+            data[idx] = fillColor.r;
+            data[idx + 1] = fillColor.g;
+            data[idx + 2] = fillColor.b;
+            data[idx + 3] = fillColor.a;
+
+            if (cx > 0) stack.push([cx - 1, cy]);
+            if (cx < width - 1) stack.push([cx + 1, cy]);
+            if (cy > 0) stack.push([cx, cy - 1]);
+            if (cy < height - 1) stack.push([cx, cy + 1]);
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    }
 
 
     function initStateMachine() {
@@ -135,7 +209,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
                         if (appState.tool === "stamp") {
                             placeStamp(x, y);
                             currentState = STATES.IDLE;
-                        } else {
+                        }else if (appState.tool === "fill") {
+                            Fill(x, y);
+                            currentState = STATES.IDLE;
+                        }else {
                             currentState = STATES.ACTIVE;
                             appState.prevX = x;
                             appState.prevY = y;
@@ -235,6 +312,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
                 break;
             case "s":
                 actualTool("stamp");
+                break;
+            case "f":
+                actualTool("fill");
                 break;
             case "c":
                 Clean();
